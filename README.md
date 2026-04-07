@@ -1,4 +1,4 @@
-# 🧠 PERCEPTIO
+# 💾 PERCEPTIO
 
 ![Pixel Art Platformer](https://img.shields.io/badge/genre-platformer-%23FF4500?style=flat-square)
 ![Engine](https://img.shields.io/badge/engine-WinForms%20%7C%20C%23-blue?style=flat-square)
