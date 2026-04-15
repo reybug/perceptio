@@ -27,13 +27,17 @@ namespace gamegame.Models
         private const float JumpPower = -12f;
         private const float MoveAcceleration = 1.2f;
         private const float MaxSpeed = 8f;
+        private const float MoveSpeed = 5f;
         private const float Friction = 0.9f;
         private const float MaxFallSpeed = 15f;
         private bool _isTouchingLeftWall;
         private bool _isTouchingRightWall;
-        private const float WallSlideSpeed = 2f;
+        private const float WallSlideSpeed = 1.5f;
         private const float WallJumpPowerX = 10f;
         private const float WallJumpPowerY = -10f;
+        private const float WallGrabOffset = 5f;
+        private float _wallGrabX;  // Позиция X, где игрок зацепился за стену
+        private bool _isGrabbingWall;
         public PlayerCher(int startX, int startY)
         {
             X = startX;
@@ -45,67 +49,157 @@ namespace gamegame.Models
             JumpCount = 0;
             IsOnWall = false;
             IsWallSliding = false;
+            _isGrabbingWall = false;
         }
 
         // Для движения (вызывается каждый кадр)
         public void UpdatePhysics()
         {
-            // Если на стене - медленное падение
-            if (IsOnWall && !IsOnGround)
+            // Логика удержания на стене
+            if (_isGrabbingWall)
             {
+                // Зафиксированы на стене - гравитация не действует
+                // Можно медленно скользить вниз если нажать вниз
+                VelocityY = Math.Min(VelocityY, WallSlideSpeed);
+
+                // Не даем уйти от стены
+                if (_isTouchingLeftWall)
+                {
+                    X = _wallGrabX;
+                }
+                else if (_isTouchingRightWall)
+                {
+                    X = _wallGrabX;
+                }
+
+                // Если игрок пытается отойти от стены
+                if ((_isTouchingLeftWall && VelocityX > 0) ||
+                    (_isTouchingRightWall && VelocityX < 0))
+                {
+                    ReleaseWall();
+                }
+            }
+            else if (IsOnWall && !IsOnGround)
+            {
+                // На стене но не зафиксирован - медленное скольжение
                 IsWallSliding = true;
                 if (VelocityY < WallSlideSpeed)
                     VelocityY = WallSlideSpeed;
+
+                // Автоматический захват стены если игрок не двигается
+                if (Math.Abs(VelocityX) < 0.5f && !_isGrabbingWall)
+                {
+                    GrabWall();
+                }
             }
             else
             {
                 IsWallSliding = false;
             }
 
-            // Обычная гравитация если не на стене
-            if (!IsWallSliding)
+            // Обычная гравитация (если не на стене и не зафиксированы)
+            if (!IsOnWall && !_isGrabbingWall)
             {
                 VelocityY += Gravity;
                 if (VelocityY > MaxFallSpeed) VelocityY = MaxFallSpeed;
             }
 
-            // типа трение (только на земле)
+            // Трение на земле
             if (IsOnGround)
             {
                 VelocityX *= Friction;
                 if (Math.Abs(VelocityX) < 0.1f)
                     VelocityX = 0;
                 JumpCount = 0;
+                _isGrabbingWall = false;  // Сброс захвата при касании земли
             }
 
-            // обновляем позицию
+            // Движение
             X += VelocityX;
             Y += VelocityY;
+        }
+
+        // Захват стены
+        private void GrabWall()
+        {
+            if (!IsOnWall || IsOnGround) return;
+
+            _isGrabbingWall = true;
+            _wallGrabX = X;  // Запоминаем позицию
+
+            // Обнуляем горизонтальную скорость
+            VelocityX = 0;
+
+            // Немного прижимаем к стене
+            if (_isTouchingLeftWall)
+            {
+                X = _wallGrabX - WallGrabOffset;
+            }
+            else if (_isTouchingRightWall)
+            {
+                X = _wallGrabX + WallGrabOffset;
+            }
+        }
+
+        // Отпускание стены
+        private void ReleaseWall()
+        {
+            _isGrabbingWall = false;
+            IsWallSliding = false;
         }
 
         // Действия игрока
         public void MoveLeft()
         {
-            VelocityX -= MoveAcceleration;
-            if (VelocityX < -MaxSpeed) VelocityX = -MaxSpeed;
+            if (_isGrabbingWall)
+            {
+                // Если зафиксированы, движение в сторону от стены отпускает
+                if (_isTouchingRightWall)
+                {
+                    ReleaseWall();
+                    VelocityX = -MoveSpeed;
+                }
+            }
+            else
+            {
+                VelocityX = -MoveSpeed;
+            }
         }
 
         public void MoveRight()
         {
-            VelocityX += MoveAcceleration;
-            if (VelocityX > MaxSpeed) VelocityX = MaxSpeed;
+            if (_isGrabbingWall)
+            {
+                // Если зафиксированы, движение в сторону от стены отпускает
+                if (_isTouchingLeftWall)
+                {
+                    ReleaseWall();
+                    VelocityX = MoveSpeed;
+                }
+            }
+            else
+            {
+                VelocityX = MoveSpeed;
+            }
         }
 
         public void Jump()
         {
-            if (IsOnGround)
+            if (_isGrabbingWall)
             {
+                // Прыжок от стены с фиксации
+                WallJump();
+            }
+            else if (IsOnGround)
+            {
+                // Обычный прыжок
                 VelocityY = JumpPower;
                 IsOnGround = false;
                 JumpCount = 1;
             }
-            else if (JumpCount < MaxJumps)  // Второй прыжок в воздухе
+            else if (JumpCount < 2)
             {
+                // Двойной прыжок
                 VelocityY = JumpPower;
                 JumpCount++;
             }
@@ -113,36 +207,55 @@ namespace gamegame.Models
 
         public void Stop()
         {
-            VelocityX = 0;
+            if (!_isGrabbingWall)
+            {
+                VelocityX = 0;
+            }
         }
+
+        public bool IsGrabbingWall => _isGrabbingWall;
 
         // Новый метод для проверки касания стен
         public void CheckWallCollision(bool touchingLeft, bool touchingRight)
         {
+            bool wasOnWall = IsOnWall;
             _isTouchingLeftWall = touchingLeft;
             _isTouchingRightWall = touchingRight;
             IsOnWall = (touchingLeft || touchingRight) && !IsOnGround;
+
+            // Если потеряли касание со стеной - отпускаем
+            if (!IsOnWall && _isGrabbingWall)
+            {
+                ReleaseWall();
+            }
+
+            // Если только что коснулись стены и не на земле - автоматический захват
+            if (!wasOnWall && IsOnWall && !IsOnGround && !_isGrabbingWall)
+            {
+                GrabWall();
+            }
         }
 
         // Метод для прыжка от стены
         public void WallJump()
         {
-            if (!IsOnWall) return;
+            if (!IsOnWall && !_isGrabbingWall) return;
 
             // Прыжок в противоположную сторону от стены
-            if (_isTouchingLeftWall)
+            if (_isTouchingLeftWall || (_isGrabbingWall && _wallGrabX < X))
             {
-                VelocityX = WallJumpPowerX;
+                VelocityX = 12f;  // Отталкиваемся вправо
             }
-            else if (_isTouchingRightWall)
+            else if (_isTouchingRightWall || (_isGrabbingWall && _wallGrabX > X))
             {
-                VelocityX = -WallJumpPowerX;
+                VelocityX = -12f;  // Отталкиваемся влево
             }
 
-            VelocityY = WallJumpPowerY;
+            VelocityY = -11f;  // Сила прыжка от стены
+            _isGrabbingWall = false;
             IsOnWall = false;
             IsWallSliding = false;
-            JumpCount = 0;  // Сбрасываем прыжки после валлджампа
+            JumpCount = 1;  // Даем возможность сделать двойной прыжок после валлджампа
         }
 
         // Отброс назад при уроне
@@ -150,9 +263,13 @@ namespace gamegame.Models
         {
             if (!IsAlive) return;
             Health -= damage;
-            VelocityX = -5 * Math.Sign(VelocityX);
+            if (Health < 0) Health = 0;
+
+            // Отбрасывание при получении урона
+            VelocityX = (VelocityX > 0 ? -8 : 8);
             VelocityY = -8;
             IsOnGround = false;
+            _isGrabbingWall = false;  // Сброс захвата при уроне
         }
 
         /*

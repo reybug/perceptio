@@ -13,16 +13,21 @@ namespace gamegame.Models
         public float Y { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
+        public PlatformType Type { get; set; }
 
         // "подушка" для коллизии
         private const float CollisionTolerance = 5f;
-        public Platform(float x, float y, int width, int height)
+        public Platform(float x, float y, int width, int height, PlatformType type = PlatformType.Normal)
         {
             X = x;
             Y = y;
             Width = width;
             Height = height;
+            Type = type;
         }
+
+        // Проверка, можно ли цепляться за эту платформу
+        public bool IsGrabbable => Type == PlatformType.Wall;
 
         // Взаимодействие игрока с платформой
         public bool CollidesWith(PlayerCher player, int playerWidth, int playerHeight, out float newY, out bool isOnTop)
@@ -61,6 +66,38 @@ namespace gamegame.Models
                     newY = Y + Height;
                     return true;
                 }
+            }
+
+            return false;
+        }
+
+        public bool CheckWallCollision(PlayerCher player, int playerWidth, int playerHeight,
+                                       out bool touchingLeft, out bool touchingRight)
+        {
+            touchingLeft = false;
+            touchingRight = false;
+
+            // Только стены могут быть захвачены
+            if (Type != PlatformType.Wall) return false;
+
+            // Проверка касания левой стороны стены
+            if (player.X + playerWidth - 5 <= X + Width &&
+                player.X + playerWidth - 10 >= X &&
+                player.Y + playerHeight - 10 > Y &&
+                player.Y + 10 < Y + Height)
+            {
+                touchingRight = true;
+                return true;
+            }
+
+            // Проверка касания правой стороны стены
+            if (player.X + 5 >= X &&
+                player.X + 10 <= X + Width &&
+                player.Y + playerHeight - 10 > Y &&
+                player.Y + 10 < Y + Height)
+            {
+                touchingLeft = true;
+                return true;
             }
 
             return false;

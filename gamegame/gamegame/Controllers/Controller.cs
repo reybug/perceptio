@@ -92,6 +92,11 @@ namespace gamegame.Controllers
             }
         }
 
+        public bool IsPlayerGrabbingWall()
+        {
+            return _model.Player.IsGrabbingWall;
+        }
+
         // Получение состояния для отрисовки
         public WorldState GetWorldState()
         {

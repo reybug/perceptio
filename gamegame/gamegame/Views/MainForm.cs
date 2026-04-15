@@ -1,4 +1,6 @@
-﻿using System;
+﻿using gamegame.Controllers;
+using gamegame.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,7 +9,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using gamegame.Controllers;
 
 namespace gamegame.Views
 {
@@ -133,15 +134,35 @@ namespace gamegame.Views
             // Рисуем платформы
             foreach (var platform in worldState.Platforms)
             {
-                g.FillRectangle(_platformBrush, platform.X, platform.Y, platform.Width, platform.Height);
+                if (platform.Type == PlatformType.Normal)
+                {
+                    // Обычные платформы - зеленые
+                    g.FillRectangle(Brushes.Green, platform.X, platform.Y, platform.Width, platform.Height);
+                }
+                else if (platform.Type == PlatformType.Wall)
+                {
+                    // Стены - коричневые/серые с текстурой
+                    g.FillRectangle(Brushes.SaddleBrown, platform.X, platform.Y, platform.Width, platform.Height);
+                    // Добавляем полоски для визуального отличия
+                    using (Pen darkPen = new Pen(Brushes.Brown, 2))
+                    {
+                        for (int i = 0; i < platform.Height; i += 15)
+                        {
+                            g.DrawLine(darkPen, platform.X + 5, platform.Y + i,
+                                       platform.X + platform.Width - 5, platform.Y + i);
+                        }
+                    }
+                }
             }
 
             // Выбираем цвет игрока в зависимости от состояния
             Brush playerColor = _playerBrush;
-            if (_controller.IsPlayerOnWall())
-                playerColor = Brushes.Orange;  // Оранжевый на стене
+            if (_controller.IsPlayerGrabbingWall())     // НОВЫЙ метод
+                playerColor = Brushes.Gold;              // Золотой - зафиксирован на стене
+            else if (_controller.IsPlayerOnWall())
+                playerColor = Brushes.Orange;            // Оранжевый - касается стены
             else if (_controller.CanDoubleJump())
-                playerColor = Brushes.LightBlue;  // Светло-голубой когда есть двойной прыжок
+                playerColor = Brushes.LightBlue;         // Светло-голубой - есть двойной прыжок
 
             // Рисуем игрока
             g.FillRectangle(playerColor, worldState.PlayerX, worldState.PlayerY, 32, 32);
@@ -157,24 +178,29 @@ namespace gamegame.Views
 
         private void DrawUI(Graphics g, WorldState worldState)
         {
-            // Здоровье (рисуем сердечки вместо цифр)
+            // Сердечки здоровья
             for (int i = 0; i < worldState.PlayerHealth; i++)
             {
                 g.FillRectangle(Brushes.Red, 10 + i * 25, 10, 20, 20);
             }
 
-            // Очки
             g.DrawString($"Score: {worldState.Score}", _uiFont, Brushes.Black, 10, 40);
 
-            // Информация о прыжке
-            string jumpInfo = _controller.CanDoubleJump() ? "★ Double jump ready!" : "☆ No double jump";
             Font smallFont = new Font("Arial", 12);
+
+            // Информация о двойном прыжке
+            string jumpInfo = _controller.CanDoubleJump() ? "★ Double jump ready!" : "☆ No double jump";
             g.DrawString(jumpInfo, smallFont, Brushes.DarkBlue, 10, 70);
 
             // Информация о стене
-            if (_controller.IsPlayerOnWall())
+            if (_controller.IsPlayerGrabbingWall())
             {
-                string wallInfo = "◆ On wall! Press SPACE to wall jump! ◆";
+                string wallInfo = "◆ GRABBED! Press SPACE to wall jump! ◆";
+                g.DrawString(wallInfo, smallFont, Brushes.Gold, 10, 90);
+            }
+            else if (_controller.IsPlayerOnWall())
+            {
+                string wallInfo = "◆ On wall! Stop moving to grab! ◆";
                 g.DrawString(wallInfo, smallFont, Brushes.Orange, 10, 90);
             }
         }

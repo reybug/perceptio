@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using gamegame.Models;
 
 namespace gamegame.Models
 {
@@ -22,6 +23,7 @@ namespace gamegame.Models
         public void MovePlayerRight() => Player.MoveRight();
         public void PlayerJump() => Player.Jump();
         public void StopPlayer() => Player.Stop();
+        public void PlayerWallJump() => Player.WallJump();
 
         public World()
         {
@@ -31,10 +33,17 @@ namespace gamegame.Models
             // + платформы
             Platforms = new List<Platform>
             {
-                new Platform(0, 450, 800, 50),  // Земля
-                new Platform(200, 380, 100, 20), // Средняя
-                new Platform(500, 320, 100, 20), // Высокая
-                new Platform(50, 300, 80, 20)    // Левая
+                // Земля (обычная платформа)
+                new Platform(0, 450, 800, 50, PlatformType.Normal),
+                
+                // Обычные горизонтальные платформы (нельзя цепляться)
+                new Platform(200, 380, 100, 20, PlatformType.Normal),
+                new Platform(500, 320, 100, 20, PlatformType.Normal),
+                
+                // СТЕНЫ (вертикальные платформы - можно цепляться!)
+                new Platform(680, 280, 20, 100, PlatformType.Wall),   // Правая стена
+                new Platform(100, 280, 20, 100, PlatformType.Wall),    // Левая стена
+                new Platform(400, 200, 20, 80, PlatformType.Wall),     // Стена в воздухе для тренировки
             };
 
             Score = 0;
@@ -81,10 +90,9 @@ namespace gamegame.Models
                         Player.VelocityY = 0;
                         Player.IsOnGround = true;
                     }
-                    else
+                    else if (Player.VelocityY < 0)
                     {
                         // Столкновение снизу или сбоку
-                        if (Player.VelocityY < 0)
                             Player.VelocityY = 0;
                     }
                 }
@@ -103,31 +111,29 @@ namespace gamegame.Models
 
             foreach (var platform in Platforms)
             {
-                // Проверка касания левой стены платформы
-                if (Player.X + 5 <= platform.X + platform.Width &&
-                    Player.X + 10 >= platform.X &&
-                    Player.Y + 32 > platform.Y &&
-                    Player.Y < platform.Y + platform.Height)
+                // Только стены (PlatformType.Wall)
+                if (platform.Type != PlatformType.Wall) continue;
+
+                // Проверка касания левой стороны стены (игрок справа от стены)
+                if (Player.X + 32 > platform.X &&
+                    Player.X + 32 < platform.X + platform.Width + 10 &&
+                    Player.Y + 25 > platform.Y &&
+                    Player.Y + 10 < platform.Y + platform.Height)
                 {
-                    touchingRight = true;  // Касается правой стороны платформы
+                    touchingRight = true;
                 }
 
-                // Проверка касания правой стены платформы
-                if (Player.X + 32 - 5 >= platform.X &&
-                    Player.X + 32 - 10 <= platform.X + platform.Width &&
-                    Player.Y + 32 > platform.Y &&
-                    Player.Y < platform.Y + platform.Height)
+                // Проверка касания правой стороны стены (игрок слева от стены)
+                if (Player.X < platform.X + platform.Width &&
+                    Player.X + 10 > platform.X - 10 &&
+                    Player.Y + 25 > platform.Y &&
+                    Player.Y + 10 < platform.Y + platform.Height)
                 {
-                    touchingLeft = true;  // Касается левой стороны платформы
+                    touchingLeft = true;
                 }
             }
 
             Player.CheckWallCollision(touchingLeft, touchingRight);
-        }
-
-        public void PlayerWallJump()
-        {
-            Player.WallJump();
         }
 
         private void RespawnPlayer()
