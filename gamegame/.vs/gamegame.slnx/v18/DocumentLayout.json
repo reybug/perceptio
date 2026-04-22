@@ -1,32 +1,51 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\\u0420\u0435\u0439\\perceptio\\gamegame\\",
+  "WorkspaceRootPath": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\\u0420\u0435\u0439\\perceptio\\gamegame\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|c:\\users\\\u0440\u0435\u0439\\desktop\\ychoba\\sharps\\gamegame\\gamegame\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|solutionrelative:gamegame\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\views\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|solutionrelative:gamegame\\views\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
-      "VerticalTabListWidth": 256,
+      "VerticalTabListWidth": 100,
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainForm.cs",
+              "DocumentMoniker": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Views\\MainForm.cs",
+              "RelativeDocumentMoniker": "gamegame\\Views\\MainForm.cs",
+              "ToolTip": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Views\\MainForm.cs",
+              "RelativeToolTip": "gamegame\\Views\\MainForm.cs",
+              "ViewState": "AgIAAMUAAAAAAAAAAADwv+IAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-07T16:05:16.452Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\\u0420\u0435\u0439\\perceptio\\gamegame\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\Users\\\u0420\u0435\u0439\\perceptio\\gamegame\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAVAAAAAAAAAA==",
+              "DocumentMoniker": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Program.cs",
+              "RelativeDocumentMoniker": "gamegame\\Program.cs",
+              "ToolTip": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Program.cs",
+              "RelativeToolTip": "gamegame\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-07T18:16:50.747Z",
+              "WhenOpened": "2026-04-22T09:55:31.359Z",
+              "IsPinned": true,
               "EditorCaption": ""
             }
           ]
