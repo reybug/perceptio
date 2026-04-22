@@ -3,32 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|c:\\users\\\u0440\u0435\u0439\\desktop\\ychoba\\sharps\\gamegame\\gamegame\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|solutionrelative:gamegame\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|c:\\users\\\u0440\u0435\u0439\\desktop\\ychoba\\sharps\\gamegame\\gamegame\\views\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\views\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|solutionrelative:gamegame\\views\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\models\\world.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|solutionrelative:gamegame\\models\\world.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\controllers\\controller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|solutionrelative:gamegame\\controllers\\controller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\models\\playercher.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|solutionrelative:gamegame\\models\\playercher.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\models\\platform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|solutionrelative:gamegame\\models\\platform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|c:\\users\\\u0440\u0435\u0439\\desktop\\ychoba\\sharps\\gamegame\\gamegame\\models\\platformtype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B15511FA-CC8A-417D-96D5-CF128E839F43}|gamegame\\gamegame.csproj|solutionrelative:gamegame\\models\\platformtype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -38,58 +18,20 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "PlatformType.cs",
-              "DocumentMoniker": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Models\\PlatformType.cs",
-              "RelativeDocumentMoniker": "gamegame\\Models\\PlatformType.cs",
-              "ToolTip": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Models\\PlatformType.cs",
-              "RelativeToolTip": "gamegame\\Models\\PlatformType.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAFAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "MainForm.cs",
+              "DocumentMoniker": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Views\\MainForm.cs",
+              "RelativeDocumentMoniker": "gamegame\\Views\\MainForm.cs",
+              "ToolTip": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Views\\MainForm.cs",
+              "RelativeToolTip": "gamegame\\Views\\MainForm.cs",
+              "ViewState": "AgIAAMUAAAAAAAAAAADwv+IAAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-15T07:08:50.499Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Platform.cs",
-              "DocumentMoniker": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Models\\Platform.cs",
-              "RelativeDocumentMoniker": "gamegame\\Models\\Platform.cs",
-              "ToolTip": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Models\\Platform.cs",
-              "RelativeToolTip": "gamegame\\Models\\Platform.cs",
-              "ViewState": "AgIAAE0AAAAAAAAAAAAuwGcAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T17:42:47.973Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "World.cs",
-              "DocumentMoniker": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Models\\World.cs",
-              "RelativeDocumentMoniker": "gamegame\\Models\\World.cs",
-              "ToolTip": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Models\\World.cs",
-              "RelativeToolTip": "gamegame\\Models\\World.cs",
-              "ViewState": "AgIAAFgAAAAAAAAAAAAuwGYAAAAmAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-07T16:33:23.123Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Controller.cs",
-              "DocumentMoniker": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Controllers\\Controller.cs",
-              "RelativeDocumentMoniker": "gamegame\\Controllers\\Controller.cs",
-              "ToolTip": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Controllers\\Controller.cs",
-              "RelativeToolTip": "gamegame\\Controllers\\Controller.cs",
-              "ViewState": "AgIAAE8AAAAAAAAAAAAqwFwAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-07T16:24:29.512Z",
+              "WhenOpened": "2026-04-07T16:05:16.452Z",
+              "IsPinned": true,
               "EditorCaption": ""
             },
             {
@@ -100,35 +42,10 @@
               "RelativeDocumentMoniker": "gamegame\\Program.cs",
               "ToolTip": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Program.cs",
               "RelativeToolTip": "gamegame\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAgAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-07T15:53:12.366Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "PlayerCher.cs",
-              "DocumentMoniker": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Models\\PlayerCher.cs",
-              "RelativeDocumentMoniker": "gamegame\\Models\\PlayerCher.cs",
-              "ToolTip": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Models\\PlayerCher.cs",
-              "RelativeToolTip": "gamegame\\Models\\PlayerCher.cs",
-              "ViewState": "AgIAAMoAAAAAAAAAAAAgwNYAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-07T16:29:15.633Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "MainForm.cs",
-              "DocumentMoniker": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Views\\MainForm.cs",
-              "RelativeDocumentMoniker": "gamegame\\Views\\MainForm.cs",
-              "ToolTip": "C:\\Users\\\u0420\u0435\u0439\\Desktop\\ychoba\\sharps\\gamegame\\gamegame\\Views\\MainForm.cs",
-              "RelativeToolTip": "gamegame\\Views\\MainForm.cs",
-              "ViewState": "AgIAALEAAAAAAAAAAAAowL0AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-07T16:05:16.452Z",
+              "WhenOpened": "2026-04-22T09:55:31.359Z",
+              "IsPinned": true,
               "EditorCaption": ""
             }
           ]

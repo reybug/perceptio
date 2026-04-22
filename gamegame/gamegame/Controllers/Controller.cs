@@ -18,6 +18,7 @@ namespace gamegame.Controllers
         public int Score { get; set; }
         public bool IsGameOver { get; set; }
         public List<Platform> Platforms { get; set; }
+        public List<Enemy> Enemies { get; set; }
     }
     public class Controller
     {
@@ -82,7 +83,7 @@ namespace gamegame.Controllers
         public void Jump()
         {
             // Если на стене - делаем валлджамп
-            if (_model.Player.IsOnWall)
+            if (_model.Player.IsOnWall || _model.Player.IsGrabbingWall)
             {
                 _model.PlayerWallJump();
             }
@@ -107,7 +108,8 @@ namespace gamegame.Controllers
                 PlayerHealth = _model.Player.Health,
                 Score = _model.Score,
                 IsGameOver = _model.IsGameOver,
-                Platforms = _model.Platforms
+                Platforms = _model.Platforms,
+                Enemies = _model.Enemies
             };
         }
         public bool CanDoubleJump()
@@ -120,9 +122,14 @@ namespace gamegame.Controllers
             return _model.Player.IsOnWall;
         }
 
+        public bool IsPlayerInvincible()
+        {
+            return _model.Player.IsInvincible;
+        }
+
         public void RestartGame()
         {
-            _model = new World();  // Создаем новый мир
+            _model.Restart();
         }
     }
 }

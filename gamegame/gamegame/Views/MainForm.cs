@@ -18,12 +18,12 @@ namespace gamegame.Views
         private Timer _gameTimer;
         private BufferedGraphicsContext _graphicsContext;
         private BufferedGraphics _graphicsBuffer;
+        private int _hitFlashTimer = 0;
 
         // Цвета для отрисовки (заменить на спрайты)
         private SolidBrush _playerBrush = new SolidBrush(Color.Blue);
         private SolidBrush _enemyBrush = new SolidBrush(Color.Red);
         private SolidBrush _platformBrush = new SolidBrush(Color.Green);
-        private SolidBrush _groundBrush = new SolidBrush(Color.SaddleBrown);
         private Font _uiFont = new Font("Arial", 16);
         public MainForm()
         {
@@ -68,7 +68,7 @@ namespace gamegame.Views
         {
             // Вызов обновления через контроллер
             _controller.UpdateGame();
-
+            if (_hitFlashTimer > 0) _hitFlashTimer--;
             // Перерисовка форму
             this.Invalidate();
         }
@@ -131,19 +131,15 @@ namespace gamegame.Views
         {
             var worldState = _controller.GetWorldState();
 
-            // Рисуем платформы
             foreach (var platform in worldState.Platforms)
             {
                 if (platform.Type == PlatformType.Normal)
                 {
-                    // Обычные платформы - зеленые
                     g.FillRectangle(Brushes.Green, platform.X, platform.Y, platform.Width, platform.Height);
                 }
                 else if (platform.Type == PlatformType.Wall)
                 {
-                    // Стены - коричневые/серые с текстурой
                     g.FillRectangle(Brushes.SaddleBrown, platform.X, platform.Y, platform.Width, platform.Height);
-                    // Добавляем полоски для визуального отличия
                     using (Pen darkPen = new Pen(Brushes.Brown, 2))
                     {
                         for (int i = 0; i < platform.Height; i += 15)
@@ -155,19 +151,35 @@ namespace gamegame.Views
                 }
             }
 
-            // Выбираем цвет игрока в зависимости от состояния
+            foreach (var enemy in worldState.Enemies)
+            {
+                if (enemy.IsAlive)
+                    g.FillRectangle(_enemyBrush, enemy.X, enemy.Y, 30, 30);
+            }
+
+            // Выбираем цвет игрока с учетом получения урона
             Brush playerColor = _playerBrush;
-            if (_controller.IsPlayerGrabbingWall())     // НОВЫЙ метод
-                playerColor = Brushes.Gold;              // Золотой - зафиксирован на стене
+
+            // Эффект мигания при неуязвимости
+            if (_controller.IsPlayerInvincible())
+            {
+                // Мигаем каждые 5 кадров
+                if ((DateTime.Now.Millisecond / 50) % 2 == 0)
+                    playerColor = Brushes.White;
+                else
+                    playerColor = Brushes.Transparent;
+            }
+            else if (_controller.IsPlayerGrabbingWall())
+                playerColor = Brushes.Gold;
             else if (_controller.IsPlayerOnWall())
-                playerColor = Brushes.Orange;            // Оранжевый - касается стены
+                playerColor = Brushes.Orange;
             else if (_controller.CanDoubleJump())
-                playerColor = Brushes.LightBlue;         // Светло-голубой - есть двойной прыжок
+                playerColor = Brushes.LightBlue;
 
-            // Рисуем игрока
-            g.FillRectangle(playerColor, worldState.PlayerX, worldState.PlayerY, 32, 32);
+            // Рисуем только если не прозрачный
+            if (playerColor != Brushes.Transparent)
+                g.FillRectangle(playerColor, worldState.PlayerX, worldState.PlayerY, 32, 32);
 
-            // Рисуем информацию об игре
             DrawUI(g, worldState);
 
             if (worldState.IsGameOver)
@@ -178,52 +190,45 @@ namespace gamegame.Views
 
         private void DrawUI(Graphics g, WorldState worldState)
         {
-            // Сердечки здоровья
+            // Отображаем здоровье
             for (int i = 0; i < worldState.PlayerHealth; i++)
             {
-                g.FillRectangle(Brushes.Red, 10 + i * 25, 10, 20, 20);
+                if (i == 0)
+                    g.FillRectangle(Brushes.Red, 10 + i * 25, 10, 20, 20);
+                else
+                    g.FillRectangle(Brushes.DarkRed, 10 + i * 25, 10, 20, 20);
             }
 
-            g.DrawString($"Score: {worldState.Score}", _uiFont, Brushes.Black, 10, 40);
+            // Если игрок неуязвим - показываем индикатор
+            if (_controller.IsPlayerInvincible())
+            {
+                Font smallFont = new Font("Arial", 12);
+                g.DrawString("✦ INVINCIBLE ✦", smallFont, Brushes.Gold, 10, 35);
+                smallFont.Dispose();
+            }
 
-            Font smallFont = new Font("Arial", 12);
+            g.DrawString($"Score: {worldState.Score}", _uiFont, Brushes.Black, 10, 60);
 
-            // Информация о двойном прыжке
+            Font smallFont2 = new Font("Arial", 12);
             string jumpInfo = _controller.CanDoubleJump() ? "★ Double jump ready!" : "☆ No double jump";
-            g.DrawString(jumpInfo, smallFont, Brushes.DarkBlue, 10, 70);
+            g.DrawString(jumpInfo, smallFont2, Brushes.DarkBlue, 10, 90);
 
-            // Информация о стене
             if (_controller.IsPlayerGrabbingWall())
             {
                 string wallInfo = "◆ GRABBED! Press SPACE to wall jump! ◆";
-                g.DrawString(wallInfo, smallFont, Brushes.Gold, 10, 90);
+                g.DrawString(wallInfo, smallFont2, Brushes.Gold, 10, 110);
             }
             else if (_controller.IsPlayerOnWall())
             {
                 string wallInfo = "◆ On wall! Stop moving to grab! ◆";
-                g.DrawString(wallInfo, smallFont, Brushes.Orange, 10, 90);
+                g.DrawString(wallInfo, smallFont2, Brushes.Orange, 10, 110);
             }
-        }
 
-        // Обновление буфера при изменении размера окна
-        protected override void OnResize(EventArgs e)
-        {
-            base.OnResize(e);
-            if (_graphicsContext != null && this.ClientSize.Width > 0 && this.ClientSize.Height > 0)
-            {
-                try
-                {
-                    _graphicsBuffer?.Dispose();
-                    _graphicsBuffer = _graphicsContext.Allocate(this.CreateGraphics(), this.ClientRectangle);
-                    this.Invalidate();
-                }
-                catch { /* Игнор ошибки изменения размера */ }
-            }
+            smallFont2.Dispose(); // Освобождаем ресурсы
         }
 
         private void DrawGameOver(Graphics g)
         {
-            // Полупрозрачный фон
             using (Brush overlay = new SolidBrush(Color.FromArgb(128, 0, 0, 0)))
             {
                 g.FillRectangle(overlay, 0, 0, this.ClientSize.Width, this.ClientSize.Height);
@@ -239,6 +244,21 @@ namespace gamegame.Views
             var restartSize = g.MeasureString(restartText, restartFont);
             g.DrawString(restartText, restartFont, Brushes.White,
                 400 - restartSize.Width / 2, 320 - restartSize.Height / 2);
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            if (_graphicsContext != null && this.ClientSize.Width > 0 && this.ClientSize.Height > 0)
+            {
+                try
+                {
+                    _graphicsBuffer?.Dispose();
+                    _graphicsBuffer = _graphicsContext.Allocate(this.CreateGraphics(), this.ClientRectangle);
+                    this.Invalidate();
+                }
+                catch { }
+            }
         }
 
         // Вызывается контроллером, чтобы запросить перерисовку

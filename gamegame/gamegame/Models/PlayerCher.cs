@@ -38,27 +38,43 @@ namespace gamegame.Models
         private const float WallGrabOffset = 5f;
         private float _wallGrabX;  // Позиция X, где игрок зацепился за стену
         private bool _isGrabbingWall;
+        public bool IsGrabbingWall => _isGrabbingWall;
+
+        // для неуязвимости после удара
+        public bool IsInvincible { get; private set; }
+        private int _invincibilityTimer = 0;
+        private const int InvincibilityDuration = 90;
         public PlayerCher(int startX, int startY)
         {
             X = startX;
             Y = startY;
             VelocityX = 0;
             VelocityY = 0;
-            Health = 3;
+            Health = 2;
             IsOnGround = false;
             JumpCount = 0;
             IsOnWall = false;
             IsWallSliding = false;
             _isGrabbingWall = false;
+            IsInvincible = false;
+            _invincibilityTimer = 0;
         }
 
         // Для движения (вызывается каждый кадр)
         public void UpdatePhysics()
         {
+            if (_invincibilityTimer > 0)
+            {
+                _invincibilityTimer--;
+                if (_invincibilityTimer <= 0)
+                {
+                    IsInvincible = false;
+                }
+            }
+
             // Логика удержания на стене
             if (_isGrabbingWall)
             {
-                // Зафиксированы на стене - гравитация не действует
                 // Можно медленно скользить вниз если нажать вниз
                 VelocityY = Math.Min(VelocityY, WallSlideSpeed);
 
@@ -213,8 +229,6 @@ namespace gamegame.Models
             }
         }
 
-        public bool IsGrabbingWall => _isGrabbingWall;
-
         // Новый метод для проверки касания стен
         public void CheckWallCollision(bool touchingLeft, bool touchingRight)
         {
@@ -262,14 +276,27 @@ namespace gamegame.Models
         public void TakeDamage(int damage)
         {
             if (!IsAlive) return;
+            if (IsInvincible) return;
             Health -= damage;
-            if (Health < 0) Health = 0;
+            if (Health <= 0)
+            {
+                Health = 0;
+                // Смерть
+                VelocityX = 0;
+                VelocityY = -10;
+            }
+            else
+            {
+                // Ранены, но живы - неуязвимость
+                IsInvincible = true;
+                _invincibilityTimer = InvincibilityDuration;
 
-            // Отбрасывание при получении урона
-            VelocityX = (VelocityX > 0 ? -8 : 8);
-            VelocityY = -8;
-            IsOnGround = false;
-            _isGrabbingWall = false;  // Сброс захвата при уроне
+                // Отбрасывание
+                VelocityX = (VelocityX > 0 ? -10 : 10);
+                VelocityY = -10;
+                IsOnGround = false;
+                _isGrabbingWall = false;
+            }
         }
 
         /*
@@ -280,7 +307,20 @@ namespace gamegame.Models
         }
         */
 
-        // тест
+        // сброс состояния при рестарте
+        public void Reset()
+        {
+            Health = 2;
+            IsInvincible = false;
+            _invincibilityTimer = 0;
+            VelocityX = 0;
+            VelocityY = 0;
+            IsOnGround = false;
+            JumpCount = 0;
+            IsOnWall = false;
+            _isGrabbingWall = false;
+        }
+
         public void SetPosition(int x, int y)
         {
             X = x;

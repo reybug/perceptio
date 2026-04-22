@@ -41,7 +41,7 @@ namespace gamegame.Models
             float oldBottom = oldY + playerHeight;
             float newBottom = player.Y + playerHeight;
 
-            // Проверяем столкновение с учётом движения между кадрами
+            // Проверяем столкновение
             bool horizontalCollision = player.X + playerWidth > X + CollisionTolerance &&
                                         player.X < X + Width - CollisionTolerance;
 

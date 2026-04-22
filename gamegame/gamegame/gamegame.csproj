@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\Controller.cs" />
+    <Compile Include="Models\Enemy.cs" />
     <Compile Include="Models\Platform.cs" />
     <Compile Include="Models\PlatformType.cs" />
     <Compile Include="Models\PlayerCher.cs" />

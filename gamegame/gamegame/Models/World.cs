@@ -10,6 +10,7 @@ namespace gamegame.Models
     public class World
     {
         public PlayerCher Player { get; private set; }
+        public List<Enemy> Enemies { get; private set; }
         public List<Platform> Platforms { get; private set; }
         public int Score { get; private set; }
         public bool IsGameOver { get; private set; }
@@ -29,6 +30,16 @@ namespace gamegame.Models
         {
             // + игрок
             Player = new PlayerCher(100, 400);
+
+            // не кенты 
+            Enemies = new List<Enemy>
+            {
+                // Левый
+                new Enemy(220, 350, 200, 280),
+                
+                // Правый
+                new Enemy(650, 420, 550, 750)
+            };
 
             // + платформы
             Platforms = new List<Platform>
@@ -61,6 +72,13 @@ namespace gamegame.Models
             // Обрабатываем коллизии
             HandlePlatformCollisions();
             CheckWallCollisions();
+
+            foreach (var enemy in Enemies)
+            {
+                enemy.Update();
+            }
+
+            HandleEnemyCollisions();
 
             // Проверка на смерть от падения
             if (Player.Y > 600)
@@ -136,12 +154,66 @@ namespace gamegame.Models
             Player.CheckWallCollision(touchingLeft, touchingRight);
         }
 
+        private void HandleEnemyCollisions()
+        {
+            // Обрабатываем каждого врага отдельно
+            for (int i = 0; i < Enemies.Count; i++)
+            {
+                var enemy = Enemies[i];
+                if (!enemy.IsAlive) continue;
+
+                // Проверяем, наступил ли игрок на врага сверху
+                if (enemy.IsPlayerLandingOnTop(Player, PlayerWidth, PlayerHeight))
+                {
+                    enemy.Die();
+                    Score += 100;
+                    Player.VelocityY = -10;  // Отскок после убийства врага
+                    continue;  // Переходим к следующему врагу
+                }
+
+                // Обычное столкновение сбоку - игрок получает урон
+                if (enemy.CollidesWith(Player, PlayerWidth, PlayerHeight))
+                {
+                    Player.TakeDamage(1);
+
+                    // Отбрасываем игрока в сторону от врага
+                    if (Player.X < enemy.X)
+                    {
+                        Player.VelocityX = -8;
+                    }
+                    else
+                    {
+                        Player.VelocityX = 8;
+                    }
+                    Player.VelocityY = -6;
+
+                    break;  // Только один враг может ударить за кадр
+                }
+            }
+
+            // Удаляем мертвых врагов
+            Enemies.RemoveAll(e => !e.IsAlive);
+        }
         private void RespawnPlayer()
         {
             Player.SetPosition(100, 400);
             Player.VelocityX = 0;
             Player.VelocityY = 0;
             Player.IsOnGround = true;
+        }
+
+        public void Restart()
+        {
+            Player.Reset();
+            Player.SetPosition(100, 400);
+
+            // Восстанавливаем врагов
+            Enemies.Clear();
+            Enemies.Add(new Enemy(220, 350, 200, 280));
+            Enemies.Add(new Enemy(650, 420, 550, 750));
+
+            Score = 0;
+            IsGameOver = false;
         }
 
         // Для тестов
