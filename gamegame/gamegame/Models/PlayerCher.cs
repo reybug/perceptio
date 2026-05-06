@@ -229,6 +229,11 @@ namespace gamegame.Models
             }
         }
 
+        public void ResetJumps()
+        {
+            JumpCount = 0;  // Сбрасываем счётчик прыжков
+        }
+
         // Новый метод для проверки касания стен
         public void CheckWallCollision(bool touchingLeft, bool touchingRight)
         {
@@ -298,27 +303,17 @@ namespace gamegame.Models
                 _isGrabbingWall = false;
             }
         }
-
-        /*
-        public void Heal(int amount)
-        {
-            Health += amount;
-            if (Health > 5) Health = 5;
-        }
-        */
-
-        // сброс состояния при рестарте
         public void Reset()
         {
             Health = 2;
             IsInvincible = false;
             _invincibilityTimer = 0;
-            VelocityX = 0;
-            VelocityY = 0;
-            IsOnGround = false;
             JumpCount = 0;
             IsOnWall = false;
+            IsWallSliding = false;
             _isGrabbingWall = false;
+            VelocityX = 0;
+            VelocityY = 0;
         }
 
         public void SetPosition(int x, int y)

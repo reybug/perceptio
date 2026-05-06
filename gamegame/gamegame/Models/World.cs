@@ -12,6 +12,7 @@ namespace gamegame.Models
         public PlayerCher Player { get; private set; }
         public List<Enemy> Enemies { get; private set; }
         public List<Platform> Platforms { get; private set; }
+        public List<JumpRefill> JumpRefills { get; private set; }
         public int Score { get; private set; }
         public bool IsGameOver { get; private set; }
 
@@ -32,33 +33,124 @@ namespace gamegame.Models
             Player = new PlayerCher(100, 400);
 
             // не кенты 
-            Enemies = new List<Enemy>
-            {
-                // Левый
-                new Enemy(220, 350, 200, 280),
-                
-                // Правый
-                new Enemy(650, 420, 550, 750)
-            };
+            Enemies = new List<Enemy>();
 
             // + платформы
-            Platforms = new List<Platform>
-            {
-                // Земля (обычная платформа)
-                new Platform(0, 450, 800, 50, PlatformType.Normal),
-                
-                // Обычные горизонтальные платформы (нельзя цепляться)
-                new Platform(200, 380, 100, 20, PlatformType.Normal),
-                new Platform(500, 320, 100, 20, PlatformType.Normal),
-                
-                // СТЕНЫ (вертикальные платформы - можно цепляться!)
-                new Platform(680, 280, 20, 100, PlatformType.Wall),   // Правая стена
-                new Platform(100, 280, 20, 100, PlatformType.Wall),    // Левая стена
-                new Platform(400, 200, 20, 80, PlatformType.Wall),     // Стена в воздухе для тренировки
-            };
+            Platforms = new List<Platform>();
 
-            Score = 0;
-            IsGameOver = false;
+            JumpRefills = new List<JumpRefill>();
+
+            BuildLevel();
+        }
+
+        private void BuildLevel()
+        {
+            // ===========================================
+            // УРОВЕНЬ 1: ПЛАТФОРМЫ + ДВОЙНОЙ ПРЫЖОК
+            // ===========================================
+
+            // Земля
+            Platforms.Add(new Platform(0, 450, 300, 50, PlatformType.Normal));
+
+            // Простой разрыв - обычный прыжок
+            Platforms.Add(new Platform(350, 450, 80, 20, PlatformType.Normal));
+
+            // Разрыв побольше - нужен двойной прыжок
+            Platforms.Add(new Platform(500, 420, 60, 20, PlatformType.Normal));
+            Platforms.Add(new Platform(620, 390, 60, 20, PlatformType.Normal));
+            Platforms.Add(new Platform(740, 360, 60, 20, PlatformType.Normal));
+
+            // Точка восстановления (видимый кристалл)
+            JumpRefills.Add(new JumpRefill(770, 340));
+
+            // ===========================================
+            // УРОВЕНЬ 2: СТЕНЫ (обязательное карабканье)
+            // ===========================================
+
+            // Вертикальная стена - нужно залезть вверх
+            Platforms.Add(new Platform(850, 450, 30, 200, PlatformType.Wall));
+
+            // Платформа сверху, куда можно попасть только через стену
+            Platforms.Add(new Platform(820, 250, 60, 20, PlatformType.Normal));
+
+            // Ещё одна стена выше
+            Platforms.Add(new Platform(880, 200, 30, 150, PlatformType.Wall));
+            Platforms.Add(new Platform(850, 120, 80, 20, PlatformType.Normal));
+
+            JumpRefills.Add(new JumpRefill(890, 100));
+
+            // ===========================================
+            // УРОВЕНЬ 3: ПРЫЖКИ МЕЖДУ СТЕНАМИ
+            // ===========================================
+
+            // Стена слева
+            Platforms.Add(new Platform(950, 400, 25, 150, PlatformType.Wall));
+            // Стена справа (выше)
+            Platforms.Add(new Platform(1020, 320, 25, 150, PlatformType.Wall));
+            // Стена слева (ещё выше)
+            Platforms.Add(new Platform(950, 240, 25, 150, PlatformType.Wall));
+            // Стена справа (финал)
+            Platforms.Add(new Platform(1020, 160, 25, 150, PlatformType.Wall));
+
+            // Выход после серии wall jump
+            Platforms.Add(new Platform(990, 100, 80, 20, PlatformType.Normal));
+
+            // ===========================================
+            // УРОВЕНЬ 4: ВРАГИ (нужно убивать сверху)
+            // ===========================================
+
+            // Платформа с врагом
+            Platforms.Add(new Platform(1150, 450, 100, 20, PlatformType.Normal));
+            Enemies.Add(new Enemy(1170, 420, 1150, 1250));
+
+            // Нужно подпрыгнуть и приземлиться на врага
+            Platforms.Add(new Platform(1300, 400, 80, 20, PlatformType.Normal));
+            Enemies.Add(new Enemy(1320, 370, 1300, 1380));
+
+            JumpRefills.Add(new JumpRefill(1380, 380));
+
+            // ===========================================
+            // УРОВЕНЬ 5: ВСЁ ВМЕСТЕ
+            // ===========================================
+
+            // Стена
+            Platforms.Add(new Platform(1450, 400, 25, 150, PlatformType.Wall));
+            // Платформа с врагом
+            Platforms.Add(new Platform(1530, 350, 80, 20, PlatformType.Normal));
+            Enemies.Add(new Enemy(1550, 320, 1530, 1610));
+            // Стена после врага
+            Platforms.Add(new Platform(1650, 300, 25, 150, PlatformType.Wall));
+            // Платформа вверху
+            Platforms.Add(new Platform(1620, 200, 80, 20, PlatformType.Normal));
+
+            // ===========================================
+            // УРОВЕНЬ 6: ДВОЙНОЙ ПРЫЖОК НАД ПРОПАСТЬЮ
+            // ===========================================
+
+            // Огромный разрыв - только двойной прыжок
+            Platforms.Add(new Platform(1780, 450, 60, 20, PlatformType.Normal));
+            Platforms.Add(new Platform(1920, 400, 60, 20, PlatformType.Normal));
+            Platforms.Add(new Platform(2060, 350, 60, 20, PlatformType.Normal));
+
+            JumpRefills.Add(new JumpRefill(2090, 330));
+
+            // ===========================================
+            // УРОВЕНЬ 7: ФИНАЛ
+            // ===========================================
+
+            // Сложная комбинация: стена -> враг -> платформа -> стена
+            Platforms.Add(new Platform(2200, 450, 25, 150, PlatformType.Wall));
+            Platforms.Add(new Platform(2280, 400, 80, 20, PlatformType.Normal));
+            Enemies.Add(new Enemy(2300, 370, 2280, 2360));
+            Platforms.Add(new Platform(2380, 320, 25, 200, PlatformType.Wall));
+            Platforms.Add(new Platform(2350, 220, 80, 20, PlatformType.Normal));
+
+            // ФИНИШ
+            Platforms.Add(new Platform(2480, 380, 100, 20, PlatformType.Normal));
+
+            // Бонусные точки восстановления в сложных местах
+            JumpRefills.Add(new JumpRefill(1650, 280));
+            JumpRefills.Add(new JumpRefill(2380, 300));
         }
 
         // Главный метод обновления мира (каждый кадр из таймера)
@@ -72,6 +164,7 @@ namespace gamegame.Models
             // Обрабатываем коллизии
             HandlePlatformCollisions();
             CheckWallCollisions();
+            HandleJumpRefills();
 
             foreach (var enemy in Enemies)
             {
@@ -80,10 +173,17 @@ namespace gamegame.Models
 
             HandleEnemyCollisions();
 
+            // Проверка победы
+            if (Player.X >= 2480 && Player.Y >= 360 && Player.Y <= 430)
+            {
+                IsGameOver = true;
+                Score += 1000;
+            }
+
             // Проверка на смерть от падения
             if (Player.Y > 600)
             {
-                Player.TakeDamage(3);
+                Player.TakeDamage(1);
                 RespawnPlayer();
             }
 
@@ -110,15 +210,10 @@ namespace gamegame.Models
                     }
                     else if (Player.VelocityY < 0)
                     {
-                        // Столкновение снизу или сбоку
-                            Player.VelocityY = 0;
+                        Player.VelocityY = 0;
                     }
                 }
             }
-
-            // Границы мира
-            if (Player.X < 0) Player.X = 0;
-            if (Player.X > 800 - PlayerWidth) Player.X = 800 - PlayerWidth;
         }
 
         // Метод в GameWorld для проверки касания стен
@@ -129,25 +224,13 @@ namespace gamegame.Models
 
             foreach (var platform in Platforms)
             {
-                // Только стены (PlatformType.Wall)
                 if (platform.Type != PlatformType.Wall) continue;
 
-                // Проверка касания левой стороны стены (игрок справа от стены)
-                if (Player.X + 32 > platform.X &&
-                    Player.X + 32 < platform.X + platform.Width + 10 &&
-                    Player.Y + 25 > platform.Y &&
-                    Player.Y + 10 < platform.Y + platform.Height)
+                if (platform.CheckWallCollision(Player, PlayerWidth, PlayerHeight,
+                    out bool left, out bool right))
                 {
-                    touchingRight = true;
-                }
-
-                // Проверка касания правой стороны стены (игрок слева от стены)
-                if (Player.X < platform.X + platform.Width &&
-                    Player.X + 10 > platform.X - 10 &&
-                    Player.Y + 25 > platform.Y &&
-                    Player.Y + 10 < platform.Y + platform.Height)
-                {
-                    touchingLeft = true;
+                    touchingLeft = touchingLeft || left;
+                    touchingRight = touchingRight || right;
                 }
             }
 
@@ -156,44 +239,51 @@ namespace gamegame.Models
 
         private void HandleEnemyCollisions()
         {
-            // Обрабатываем каждого врага отдельно
             for (int i = 0; i < Enemies.Count; i++)
             {
                 var enemy = Enemies[i];
                 if (!enemy.IsAlive) continue;
 
-                // Проверяем, наступил ли игрок на врага сверху
-                if (enemy.IsPlayerLandingOnTop(Player, PlayerWidth, PlayerHeight))
-                {
-                    enemy.Die();
-                    Score += 100;
-                    Player.VelocityY = -10;  // Отскок после убийства врага
-                    continue;  // Переходим к следующему врагу
-                }
-
-                // Обычное столкновение сбоку - игрок получает урон
                 if (enemy.CollidesWith(Player, PlayerWidth, PlayerHeight))
                 {
-                    Player.TakeDamage(1);
-
-                    // Отбрасываем игрока в сторону от врага
-                    if (Player.X < enemy.X)
+                    // Падение сверху = убийство врага
+                    if (Player.VelocityY > 0 && Player.Y + PlayerHeight - Player.VelocityY <= enemy.Y + 10)
                     {
-                        Player.VelocityX = -8;
+                        enemy.Die();
+                        Score += 100;
+                        Player.VelocityY = -10;
                     }
-                    else
+                    else if (!Player.IsInvincible)
                     {
-                        Player.VelocityX = 8;
-                    }
-                    Player.VelocityY = -6;
+                        Player.TakeDamage(1);
 
-                    break;  // Только один враг может ударить за кадр
+                        if (Player.X < enemy.X)
+                            Player.VelocityX = -10;
+                        else
+                            Player.VelocityX = 10;
+                        Player.VelocityY = -8;
+                        break;
+                    }
                 }
             }
 
-            // Удаляем мертвых врагов
             Enemies.RemoveAll(e => !e.IsAlive);
         }
+
+        private void HandleJumpRefills()
+        {
+            for (int i = 0; i < JumpRefills.Count; i++)
+            {
+                var refill = JumpRefills[i];
+                if (refill.IsActive && refill.CollidesWith(Player, PlayerWidth, PlayerHeight))
+                {
+                    refill.Collect();
+                    Player.ResetJumps();
+                    Score += 50;
+                }
+            }
+        }
+
         private void RespawnPlayer()
         {
             Player.SetPosition(100, 400);
@@ -202,22 +292,34 @@ namespace gamegame.Models
             Player.IsOnGround = true;
         }
 
+        public int GetCameraOffset()
+        {
+            // Возвращаем смещение камеры (центрируем игрока)
+            float offset = Player.X - 400;
+            if (offset < 0) offset = 0;
+            if (offset > 2150) offset = 2150;  // Максимум для уровня 2450
+            return (int)offset;
+        }
+
         public void Restart()
         {
             Player.Reset();
             Player.SetPosition(100, 400);
+            Player.VelocityX = 0;
+            Player.VelocityY = 0;
+            Player.IsOnGround = true;
 
-            // Восстанавливаем врагов
+            // Очищаем и пересоздаём уровень
             Enemies.Clear();
-            Enemies.Add(new Enemy(220, 350, 200, 280));
-            Enemies.Add(new Enemy(650, 420, 550, 750));
+            Platforms.Clear();
+            JumpRefills.Clear();
 
             Score = 0;
             IsGameOver = false;
+
+            BuildLevel();
         }
 
-        // Для тестов
-        public int GetPlayerHealth() => Player.Health;
         public (float X, float Y) GetPlayerPosition() => (Player.X, Player.Y);
     }
 }

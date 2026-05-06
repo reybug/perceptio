@@ -72,31 +72,39 @@ namespace gamegame.Models
         }
 
         public bool CheckWallCollision(PlayerCher player, int playerWidth, int playerHeight,
-                                       out bool touchingLeft, out bool touchingRight)
+                               out bool touchingLeft, out bool touchingRight)
         {
             touchingLeft = false;
             touchingRight = false;
 
-            // Только стены могут быть захвачены
             if (Type != PlatformType.Wall) return false;
 
-            // Проверка касания левой стороны стены
-            if (player.X + playerWidth - 5 <= X + Width &&
-                player.X + playerWidth - 10 >= X &&
+            // Создаём "зону захвата" чуть шире стены
+            float grabZone = 8f;
+
+            // Касание правой стороны стены (игрок слева от стены)
+            if (player.X + playerWidth > X - grabZone &&
+                player.X + playerWidth < X + Width + grabZone &&
                 player.Y + playerHeight - 10 > Y &&
-                player.Y + 10 < Y + Height)
+                player.Y + 15 < Y + Height)
             {
                 touchingRight = true;
+                // Прижимаем игрока к стене
+                if (player.VelocityX > 0)
+                    player.X = X - playerWidth;
                 return true;
             }
 
-            // Проверка касания правой стороны стены
-            if (player.X + 5 >= X &&
-                player.X + 10 <= X + Width &&
+            // Касание левой стороны стены (игрок справа от стены)
+            if (player.X > X - grabZone &&
+                player.X < X + Width + grabZone &&
                 player.Y + playerHeight - 10 > Y &&
-                player.Y + 10 < Y + Height)
+                player.Y + 15 < Y + Height)
             {
                 touchingLeft = true;
+                // Прижимаем игрока к стене
+                if (player.VelocityX < 0)
+                    player.X = X + Width;
                 return true;
             }
 
