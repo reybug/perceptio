@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ namespace gamegame.Views
         private BufferedGraphicsContext _graphicsContext;
         private BufferedGraphics _graphicsBuffer;
         private int _hitFlashTimer = 0;
+        private int _cameraOffset = 0;
 
         // Цвета для отрисовки (заменить на спрайты)
         private SolidBrush _playerBrush = new SolidBrush(Color.Blue);
@@ -66,10 +68,8 @@ namespace gamegame.Views
 
         private void GameTimer_Tick(object sender, EventArgs e)
         {
-            // Вызов обновления через контроллер
             _controller.UpdateGame();
-            if (_hitFlashTimer > 0) _hitFlashTimer--;
-            // Перерисовка форму
+            _cameraOffset = _controller.GetCameraOffset();
             this.Invalidate();
         }
 
@@ -131,18 +131,33 @@ namespace gamegame.Views
         {
             var worldState = _controller.GetWorldState();
 
+            // Фоновый градиент
+            using (LinearGradientBrush gradient = new LinearGradientBrush(
+                new Rectangle(0, 0, 800, 600),
+                Color.LightSkyBlue,
+                Color.DarkSlateBlue,
+                90))
+            {
+                g.FillRectangle(gradient, 0, 0, 800, 600);
+            }
+
+            // ========== РИСУЕМ МИР СО СМЕЩЕНИЕМ КАМЕРЫ ==========
+            g.TranslateTransform(-_cameraOffset, 0);
+
+            // Платформы
             foreach (var platform in worldState.Platforms)
             {
                 if (platform.Type == PlatformType.Normal)
                 {
-                    g.FillRectangle(Brushes.Green, platform.X, platform.Y, platform.Width, platform.Height);
+                    g.FillRectangle(Brushes.Peru, platform.X, platform.Y, platform.Width, platform.Height);
+                    g.DrawRectangle(Pens.SaddleBrown, platform.X, platform.Y, platform.Width, platform.Height);
                 }
                 else if (platform.Type == PlatformType.Wall)
                 {
-                    g.FillRectangle(Brushes.SaddleBrown, platform.X, platform.Y, platform.Width, platform.Height);
-                    using (Pen darkPen = new Pen(Brushes.Brown, 2))
+                    g.FillRectangle(Brushes.DarkGray, platform.X, platform.Y, platform.Width, platform.Height);
+                    using (Pen darkPen = new Pen(Brushes.Black, 1))
                     {
-                        for (int i = 0; i < platform.Height; i += 15)
+                        for (int i = 0; i < platform.Height; i += 20)
                         {
                             g.DrawLine(darkPen, platform.X + 5, platform.Y + i,
                                        platform.X + platform.Width - 5, platform.Y + i);
@@ -151,19 +166,51 @@ namespace gamegame.Views
                 }
             }
 
+            // Точки восстановления (кристаллы)
+            foreach (var refill in worldState.JumpRefills)
+            {
+                if (refill.IsActive)
+                {
+                    Point[] crystal = new Point[]
+                    {
+                new Point((int)refill.X + 10, (int)refill.Y),
+                new Point((int)refill.X + 18, (int)refill.Y + 6),
+                new Point((int)refill.X + 18, (int)refill.Y + 14),
+                new Point((int)refill.X + 10, (int)refill.Y + 20),
+                new Point((int)refill.X + 2, (int)refill.Y + 14),
+                new Point((int)refill.X + 2, (int)refill.Y + 6)
+                    };
+
+                    for (int i = 3; i > 0; i--)
+                    {
+                        using (Brush glow = new SolidBrush(Color.FromArgb(40 / i, Color.Cyan)))
+                        {
+                            g.FillEllipse(glow, refill.X - i * 8, refill.Y - i * 5,
+                                          36 + i * 16, 36 + i * 10);
+                        }
+                    }
+
+                    g.FillPolygon(Brushes.Cyan, crystal);
+                    g.DrawPolygon(Pens.White, crystal);
+                }
+            }
+
+            // Враги
             foreach (var enemy in worldState.Enemies)
             {
                 if (enemy.IsAlive)
-                    g.FillRectangle(_enemyBrush, enemy.X, enemy.Y, 30, 30);
+                {
+                    g.FillEllipse(Brushes.DarkRed, enemy.X, enemy.Y, 30, 30);
+                    g.FillEllipse(Brushes.Red, enemy.X + 5, enemy.Y + 5, 20, 20);
+                    g.DrawLine(Pens.Black, enemy.X + 15, enemy.Y + 10, enemy.X + 15, enemy.Y + 20);
+                    g.DrawLine(Pens.Black, enemy.X + 10, enemy.Y + 15, enemy.X + 20, enemy.Y + 15);
+                }
             }
 
-            // Выбираем цвет игрока с учетом получения урона
+            // Игрок
             Brush playerColor = _playerBrush;
-
-            // Эффект мигания при неуязвимости
             if (_controller.IsPlayerInvincible())
             {
-                // Мигаем каждые 5 кадров
                 if ((DateTime.Now.Millisecond / 50) % 2 == 0)
                     playerColor = Brushes.White;
                 else
@@ -176,59 +223,96 @@ namespace gamegame.Views
             else if (_controller.CanDoubleJump())
                 playerColor = Brushes.LightBlue;
 
-            // Рисуем только если не прозрачный
             if (playerColor != Brushes.Transparent)
+            {
                 g.FillRectangle(playerColor, worldState.PlayerX, worldState.PlayerY, 32, 32);
+                g.FillEllipse(Brushes.White, worldState.PlayerX + 22, worldState.PlayerY + 8, 6, 6);
+                g.FillEllipse(Brushes.White, worldState.PlayerX + 8, worldState.PlayerY + 8, 6, 6);
+                g.FillEllipse(Brushes.Black, worldState.PlayerX + 23, worldState.PlayerY + 9, 3, 3);
+                g.FillEllipse(Brushes.Black, worldState.PlayerX + 9, worldState.PlayerY + 9, 3, 3);
+            }
 
-            DrawUI(g, worldState);
+            // РИСУЕМ ВЕСЫ
+            g.ResetTransform();
 
+            int scaleX = 2500 - _cameraOffset;  // Левая граница весов
+
+            // ПОЛ под весами
+            g.FillRectangle(Brushes.SaddleBrown, scaleX, 550, 500, 30);
+            g.DrawRectangle(Pens.Black, scaleX, 550, 500, 30);
+
+            // ЦЕНТРАЛЬНАЯ СТОЙКА (огромная) - X = 2720-2760
+            int columnX = scaleX + 220;
+            g.FillRectangle(Brushes.SaddleBrown, columnX, 250, 40, 300);
+            g.DrawRectangle(Pens.Black, columnX, 250, 40, 300);
+
+            // ВЕРХНЯЯ ПЕРЕКЛАДИНА (широкое коромысло) - X = 2500-3000
+            g.FillRectangle(Brushes.Peru, scaleX, 250, 500, 25);
+            g.DrawRectangle(Pens.Black, scaleX, 250, 500, 25);
+
+            // ВЕРЁВКИ/ЦЕПИ для левой чаши
+            using (Pen chainPen = new Pen(Brushes.Gold, 6))
+            {
+                // Левая чаша: верёвки от перекладины (X=2560-2680, Y=275) до чаши (Y=400)
+                g.DrawLine(chainPen, scaleX + 60, 275, scaleX + 70, 400);
+                g.DrawLine(chainPen, scaleX + 170, 275, scaleX + 170, 400);
+            }
+
+            // ВЕРЁВКИ/ЦЕПИ для правой чаши
+            using (Pen chainPen = new Pen(Brushes.Gold, 6))
+            {
+                g.DrawLine(chainPen, scaleX + 280, 275, scaleX + 290, 400);
+                g.DrawLine(chainPen, scaleX + 390, 275, scaleX + 390, 400);
+            }
+
+            // ЛЕВАЯ ЧАША (ОГРОМНАЯ, ФИНИШ)
+            g.FillRectangle(Brushes.Gold, scaleX + 60, 400, 120, 25);
+            g.DrawRectangle(Pens.DarkGoldenrod, scaleX + 60, 400, 120, 25);
+
+            // БОЛЬШАЯ ЗВЕЗДА на левой чаше
+            g.DrawString("★", new Font("Arial", 28, FontStyle.Bold), Brushes.Red, scaleX + 100, 396);
+
+            // ПРАВАЯ ЧАША (ОГРОМНАЯ, декоративная)
+            g.FillRectangle(Brushes.Gold, scaleX + 300, 400, 120, 25);
+            g.DrawRectangle(Pens.DarkGoldenrod, scaleX + 300, 400, 120, 25);
+            // ========== ЭКРАНЫ GAME OVER ИЛИ ПОБЕДА ==========
             if (worldState.IsGameOver)
             {
-                DrawGameOver(g);
+                if (worldState.IsVictory)
+                    DrawVictory(g);
+                else
+                    DrawGameOver(g);
             }
         }
 
         private void DrawUI(Graphics g, WorldState worldState)
         {
-            // Отображаем здоровье
+            // Сердечки здоровья
             for (int i = 0; i < worldState.PlayerHealth; i++)
             {
                 if (i == 0)
-                    g.FillRectangle(Brushes.Red, 10 + i * 25, 10, 20, 20);
+                    g.FillRectangle(Brushes.Red, 10 + i * 30, 10, 25, 22);
                 else
-                    g.FillRectangle(Brushes.DarkRed, 10 + i * 25, 10, 20, 20);
+                    g.FillRectangle(Brushes.DarkRed, 10 + i * 30, 10, 25, 22);
             }
 
-            // Если игрок неуязвим - показываем индикатор
-            if (_controller.IsPlayerInvincible())
+            // Индикатор двойного прыжка
+            if (_controller.CanDoubleJump())
             {
-                Font smallFont = new Font("Arial", 12);
-                g.DrawString("✦ INVINCIBLE ✦", smallFont, Brushes.Gold, 10, 35);
-                smallFont.Dispose();
+                g.DrawString("★ DOUBLE JUMP READY", new Font("Arial", 10, FontStyle.Bold), Brushes.DarkBlue, 10, 40);
             }
 
-            g.DrawString($"Score: {worldState.Score}", _uiFont, Brushes.Black, 10, 60);
+            g.DrawString($"Score: {worldState.Score}", _uiFont, Brushes.Black, 10, 65);
 
-            Font smallFont2 = new Font("Arial", 12);
-            string jumpInfo = _controller.CanDoubleJump() ? "★ Double jump ready!" : "☆ No double jump";
-            g.DrawString(jumpInfo, smallFont2, Brushes.DarkBlue, 10, 90);
-
-            if (_controller.IsPlayerGrabbingWall())
-            {
-                string wallInfo = "◆ GRABBED! Press SPACE to wall jump! ◆";
-                g.DrawString(wallInfo, smallFont2, Brushes.Gold, 10, 110);
-            }
-            else if (_controller.IsPlayerOnWall())
-            {
-                string wallInfo = "◆ On wall! Stop moving to grab! ◆";
-                g.DrawString(wallInfo, smallFont2, Brushes.Orange, 10, 110);
-            }
-
-            smallFont2.Dispose(); // Освобождаем ресурсы
+            // Подсказка о стенах
+            Font smallFont = new Font("Arial", 9);
+            g.DrawString("Tips: | SPACE - jump | A/D - move |", smallFont, Brushes.Gray, 10, 560);
+            g.DrawString("| On wall: press SPACE to wall jump | ★ = double jump restore |", smallFont, Brushes.Gray, 10, 575);
         }
 
         private void DrawGameOver(Graphics g)
         {
+            // Полупрозрачный фон
             using (Brush overlay = new SolidBrush(Color.FromArgb(128, 0, 0, 0)))
             {
                 g.FillRectangle(overlay, 0, 0, this.ClientSize.Width, this.ClientSize.Height);
@@ -244,6 +328,32 @@ namespace gamegame.Views
             var restartSize = g.MeasureString(restartText, restartFont);
             g.DrawString(restartText, restartFont, Brushes.White,
                 400 - restartSize.Width / 2, 320 - restartSize.Height / 2);
+        }
+
+        private void DrawVictory(Graphics g)
+        {
+            // Полупрозрачный фон
+            using (Brush overlay = new SolidBrush(Color.FromArgb(128, 0, 0, 0)))
+            {
+                g.FillRectangle(overlay, 0, 0, this.ClientSize.Width, this.ClientSize.Height);
+            }
+
+            var victoryFont = new Font("Arial", 48, FontStyle.Bold);
+            var size = g.MeasureString("VICTORY!", victoryFont);
+            g.DrawString("VICTORY!", victoryFont, Brushes.Gold,
+                400 - size.Width / 2, 200 - size.Height / 2);
+
+            var scoreFont = new Font("Arial", 24);
+            var scoreText = $"Final Score: {_controller.GetScore()}";
+            var scoreSize = g.MeasureString(scoreText, scoreFont);
+            g.DrawString(scoreText, scoreFont, Brushes.White,
+                400 - scoreSize.Width / 2, 270 - scoreSize.Height / 2);
+
+            var restartFont = new Font("Arial", 20);
+            var restartText = "Press R to play again";
+            var restartSize = g.MeasureString(restartText, restartFont);
+            g.DrawString(restartText, restartFont, Brushes.LightBlue,
+                400 - restartSize.Width / 2, 350 - restartSize.Height / 2);
         }
 
         protected override void OnResize(EventArgs e)

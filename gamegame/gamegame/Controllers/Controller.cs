@@ -19,6 +19,8 @@ namespace gamegame.Controllers
         public bool IsGameOver { get; set; }
         public List<Platform> Platforms { get; set; }
         public List<Enemy> Enemies { get; set; }
+        public List<JumpRefill> JumpRefills { get; set; }
+        public bool IsVictory { get; set; }
     }
     public class Controller
     {
@@ -80,6 +82,11 @@ namespace gamegame.Controllers
             _movingRight = false;
         }
 
+        public int GetCameraOffset()
+        {
+            return _model.GetCameraOffset();
+        }
+
         public void Jump()
         {
             // Если на стене - делаем валлджамп
@@ -109,7 +116,9 @@ namespace gamegame.Controllers
                 Score = _model.Score,
                 IsGameOver = _model.IsGameOver,
                 Platforms = _model.Platforms,
-                Enemies = _model.Enemies
+                Enemies = _model.Enemies,
+                JumpRefills = _model.JumpRefills,
+                IsVictory = _model.IsVictory
             };
         }
         public bool CanDoubleJump()
@@ -130,6 +139,11 @@ namespace gamegame.Controllers
         public void RestartGame()
         {
             _model.Restart();
+        }
+
+        public int GetScore()
+        {
+            return _model.Score;
         }
     }
 }
