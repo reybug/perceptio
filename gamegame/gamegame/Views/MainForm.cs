@@ -141,12 +141,10 @@ namespace gamegame.Views
                 g.FillRectangle(gradient, 0, 0, 800, 600);
             }
 
-            // ===========================================
-            // РИСУЕМ ИГРОВОЙ МИР СО СМЕЩЕНИЕМ КАМЕРЫ
-            // ===========================================
+            // ========== РИСУЕМ МИР СО СМЕЩЕНИЕМ КАМЕРЫ ==========
             g.TranslateTransform(-_cameraOffset, 0);
 
-            // Рисуем платформы
+            // Платформы
             foreach (var platform in worldState.Platforms)
             {
                 if (platform.Type == PlatformType.Normal)
@@ -168,7 +166,7 @@ namespace gamegame.Views
                 }
             }
 
-            // Точки восстановления
+            // Точки восстановления (кристаллы)
             foreach (var refill in worldState.JumpRefills)
             {
                 if (refill.IsActive)
@@ -234,29 +232,56 @@ namespace gamegame.Views
                 g.FillEllipse(Brushes.Black, worldState.PlayerX + 9, worldState.PlayerY + 9, 3, 3);
             }
 
-            // ФИНИШ (тоже смещается с камерой)
-            using (Pen finishPen = new Pen(Brushes.Gold, 8))
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    g.DrawLine(finishPen, 2480 + i * 10, 380, 2480 + i * 10, 430);
-                }
-            }
-
-            // ===========================================
-            // ОТМЕНЯЕМ СМЕЩЕНИЕ КАМЕРЫ ДЛЯ UI
-            // ===========================================
+            // РИСУЕМ ВЕСЫ
             g.ResetTransform();
 
-            // ===========================================
-            // РИСУЕМ UI (БЕЗ СМЕЩЕНИЯ)
-            // ===========================================
-            DrawUI(g, worldState);
+            int scaleX = 2500 - _cameraOffset;  // Левая граница весов
 
-            // РИСУЕМ GAME OVER (БЕЗ СМЕЩЕНИЯ)
+            // ПОЛ под весами
+            g.FillRectangle(Brushes.SaddleBrown, scaleX, 550, 500, 30);
+            g.DrawRectangle(Pens.Black, scaleX, 550, 500, 30);
+
+            // ЦЕНТРАЛЬНАЯ СТОЙКА (огромная) - X = 2720-2760
+            int columnX = scaleX + 220;
+            g.FillRectangle(Brushes.SaddleBrown, columnX, 250, 40, 300);
+            g.DrawRectangle(Pens.Black, columnX, 250, 40, 300);
+
+            // ВЕРХНЯЯ ПЕРЕКЛАДИНА (широкое коромысло) - X = 2500-3000
+            g.FillRectangle(Brushes.Peru, scaleX, 250, 500, 25);
+            g.DrawRectangle(Pens.Black, scaleX, 250, 500, 25);
+
+            // ВЕРЁВКИ/ЦЕПИ для левой чаши
+            using (Pen chainPen = new Pen(Brushes.Gold, 6))
+            {
+                // Левая чаша: верёвки от перекладины (X=2560-2680, Y=275) до чаши (Y=400)
+                g.DrawLine(chainPen, scaleX + 60, 275, scaleX + 70, 400);
+                g.DrawLine(chainPen, scaleX + 170, 275, scaleX + 170, 400);
+            }
+
+            // ВЕРЁВКИ/ЦЕПИ для правой чаши
+            using (Pen chainPen = new Pen(Brushes.Gold, 6))
+            {
+                g.DrawLine(chainPen, scaleX + 280, 275, scaleX + 290, 400);
+                g.DrawLine(chainPen, scaleX + 390, 275, scaleX + 390, 400);
+            }
+
+            // ЛЕВАЯ ЧАША (ОГРОМНАЯ, ФИНИШ)
+            g.FillRectangle(Brushes.Gold, scaleX + 60, 400, 120, 25);
+            g.DrawRectangle(Pens.DarkGoldenrod, scaleX + 60, 400, 120, 25);
+
+            // БОЛЬШАЯ ЗВЕЗДА на левой чаше
+            g.DrawString("★", new Font("Arial", 28, FontStyle.Bold), Brushes.Red, scaleX + 100, 396);
+
+            // ПРАВАЯ ЧАША (ОГРОМНАЯ, декоративная)
+            g.FillRectangle(Brushes.Gold, scaleX + 300, 400, 120, 25);
+            g.DrawRectangle(Pens.DarkGoldenrod, scaleX + 300, 400, 120, 25);
+            // ========== ЭКРАНЫ GAME OVER ИЛИ ПОБЕДА ==========
             if (worldState.IsGameOver)
             {
-                DrawGameOver(g);
+                if (worldState.IsVictory)
+                    DrawVictory(g);
+                else
+                    DrawGameOver(g);
             }
         }
 
@@ -284,8 +309,10 @@ namespace gamegame.Views
             g.DrawString("Tips: | SPACE - jump | A/D - move |", smallFont, Brushes.Gray, 10, 560);
             g.DrawString("| On wall: press SPACE to wall jump | ★ = double jump restore |", smallFont, Brushes.Gray, 10, 575);
         }
+
         private void DrawGameOver(Graphics g)
         {
+            // Полупрозрачный фон
             using (Brush overlay = new SolidBrush(Color.FromArgb(128, 0, 0, 0)))
             {
                 g.FillRectangle(overlay, 0, 0, this.ClientSize.Width, this.ClientSize.Height);
@@ -301,6 +328,32 @@ namespace gamegame.Views
             var restartSize = g.MeasureString(restartText, restartFont);
             g.DrawString(restartText, restartFont, Brushes.White,
                 400 - restartSize.Width / 2, 320 - restartSize.Height / 2);
+        }
+
+        private void DrawVictory(Graphics g)
+        {
+            // Полупрозрачный фон
+            using (Brush overlay = new SolidBrush(Color.FromArgb(128, 0, 0, 0)))
+            {
+                g.FillRectangle(overlay, 0, 0, this.ClientSize.Width, this.ClientSize.Height);
+            }
+
+            var victoryFont = new Font("Arial", 48, FontStyle.Bold);
+            var size = g.MeasureString("VICTORY!", victoryFont);
+            g.DrawString("VICTORY!", victoryFont, Brushes.Gold,
+                400 - size.Width / 2, 200 - size.Height / 2);
+
+            var scoreFont = new Font("Arial", 24);
+            var scoreText = $"Final Score: {_controller.GetScore()}";
+            var scoreSize = g.MeasureString(scoreText, scoreFont);
+            g.DrawString(scoreText, scoreFont, Brushes.White,
+                400 - scoreSize.Width / 2, 270 - scoreSize.Height / 2);
+
+            var restartFont = new Font("Arial", 20);
+            var restartText = "Press R to play again";
+            var restartSize = g.MeasureString(restartText, restartFont);
+            g.DrawString(restartText, restartFont, Brushes.LightBlue,
+                400 - restartSize.Width / 2, 350 - restartSize.Height / 2);
         }
 
         protected override void OnResize(EventArgs e)
